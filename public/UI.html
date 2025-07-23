@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Autopilot Config</title>
+  <link href="https://fonts.bunny.net/css?family=satoshi:400,500,700" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: "Satoshi", sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      background: url("/public/Auto_Pilot.jpg") no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      color: white;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 32px;
+      border-radius: 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    input,
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-family: "Satoshi", sans-serif;
+    }
+
+    input {
+      background: #ffffffdd;
+      color: #111;
+    }
+
+    button {
+      background: linear-gradient(to right, #3b82f6, #2563eb);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+      opacity: 0.95;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 🌫 Dark overlay -->
+  <div class="overlay"></div>
+
+  <!-- 🧠 Main Config UI -->
+  <div class="container">
+    <div class="card">
+      <h2>⚙️ Autopilot Config</h2>
+
+      <form onsubmit="submitPath(event)">
+        <input type="text" id="pathInput" placeholder="Enter Virtual Tour Folder Path" required />
+        <input type="number" id="speedInput" placeholder="Autopilot Speed in ms (e.g. 4000)" required />
+        <button type="submit">✅ Apply Settings</button>
+      </form>
+
+      <p id="status"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://localhost:5000"; // Adjust for deployment
+
+    async function submitPath(e) {
+      e.preventDefault();
+
+      const path = document.getElementById("pathInput").value.trim();
+      const speed = parseInt(document.getElementById("speedInput").value);
+      const status = document.getElementById("status");
+
+      if (!path || isNaN(speed) || speed < 1000 || speed > 20000) {
+        status.textContent = "⚠️ Please enter a valid path and speed (1000–20000 ms).";
+        return;
+      }
+
+      status.textContent = `⏳ Sending folder and speed (${speed} ms) to server...`;
+
+      try {
+        const res = await fetch(`${API_BASE}/set-path`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path, speed }),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = `✅ Path set! Autopilot script created at ${speed} ms.`;
+        } else {
+          status.textContent = "❌ " + (data.message || "Invalid path or server error.");
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = "❌ Failed to communicate with server.";
+      }
+    }
+  </script>
+</body>
+
+</html>

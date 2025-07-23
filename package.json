@@ -1,0 +1,28 @@
+{
+  "name": "autopilot-api-service",
+  "version": "1.0.0",
+  "description": "API service to generate/enable/disable autopilot for script_general.js",
+  "keywords": [
+    "autopilot",
+    "virtual-tour",
+    "3dvista",
+    "tdv",
+    "api",
+    "script-injector"
+  ],
+  "license": "MIT",
+  "author": "Your Name or Team",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
